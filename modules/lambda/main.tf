@@ -19,10 +19,10 @@ resource "aws_lambda_function" "getfunc" {
    memory_size      = 256
    publish          = true
 
-   #vpc_config{
-    # subnet_ids = [module.vpc.subnet1id, module.vpc.subnet2id]
-     #security_group_ids = [module.vpc.securitygroupid]
-   #} 
+   vpc_config{
+     subnet_ids = [module.vpc.subnet1id, module.vpc.subnet2id]
+     security_group_ids = [module.vpc.securitygroupid]
+   } 
 
    role = aws_iam_role.lambda_exec.arn
 
@@ -47,10 +47,10 @@ resource "aws_lambda_function" "postfunc" {
    memory_size      = 256
    publish          = true
 
-   #vpc_config{
-     #subnet_ids = [module.vpc.subnet1id, module.vpc.subnet2id]
-     #security_group_ids = [module.vpc.securitygroupid]
-   #} 
+   vpc_config{
+     subnet_ids = [module.vpc.subnet1id, module.vpc.subnet2id]
+     security_group_ids = [module.vpc.securitygroupid]
+   } 
 
    role = aws_iam_role.lambda_exec.arn
    tags = {

@@ -8,9 +8,25 @@ resource "aws_vpc" "tf-vpc" {
   }
 }
 
-resource "aws_subnet" "public-subnet1" {
+resource "aws_eip" "elasticip" {
+  depends_on = [aws_internet_gateway.igw1]
+}
+
+resource "aws_nat_gateway" "natgw" {
+  allocation_id = aws_eip.elasticip.id
+  subnet_id     = aws_subnet.publicsubnet1.id
+
+  depends_on = [aws_internet_gateway.igw1]
+
+  tags = {
+    Name = "natgw"
+    Environment = var.environment
+  }
+}
+
+resource "aws_subnet" "publicsubnet1" {
   vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.subnet1cidr
+  cidr_block = var.pubsubnet1cidr
 
   tags = {
     Name = "public-subnet1"
@@ -18,7 +34,36 @@ resource "aws_subnet" "public-subnet1" {
   }
 }
 
-resource "aws_route_table" "route1" {
+resource "aws_subnet" "privatesubnet1" {
+  vpc_id     = aws_vpc.tf-vpc.id
+  cidr_block = var.privsubnet1cidr
+
+  tags = {
+    Name = "private-subnet1"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table" "privroute1" {
+  vpc_id = aws_vpc.tf-vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.natgw.id
+  }
+
+  tags = {
+    Name = "privroute1"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table_association" "rtapriv1" {
+  subnet_id      = aws_subnet.privatesubnet1.id
+  route_table_id = aws_route_table.privroute1.id
+}
+
+resource "aws_route_table" "pubroute1" {
   vpc_id = aws_vpc.tf-vpc.id
 
   route {
@@ -27,28 +72,28 @@ resource "aws_route_table" "route1" {
   }
 
   tags = {
-    Name = "route1"
+    Name = "pubroute1"
     Environment = var.environment
   }
 }
 
-resource "aws_route_table_association" "a" {
-  subnet_id      = aws_subnet.public-subnet1.id
-  route_table_id = aws_route_table.route1.id
+resource "aws_route_table_association" "rtapub1" {
+  subnet_id      = aws_subnet.publicsubnet1.id
+  route_table_id = aws_route_table.pubroute1.id
 }
 
 resource "aws_internet_gateway" "igw1" {
   vpc_id = aws_vpc.tf-vpc.id
 
   tags = {
-    Name = "a"
+    Name = "igw"
     Environment = var.environment
   }
 }
 
-resource "aws_subnet" "public-subnet2" {
+resource "aws_subnet" "publicsubnet2" {
   vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.subnet2cidr
+  cidr_block = var.pubsubnet2cidr
 
   tags = {
     Name = "public-subnet2"
@@ -56,7 +101,36 @@ resource "aws_subnet" "public-subnet2" {
   }
 }
 
-resource "aws_route_table" "route2" {
+resource "aws_subnet" "privatesubnet2" {
+  vpc_id     = aws_vpc.tf-vpc.id
+  cidr_block = var.privsubnet2cidr
+
+  tags = {
+    Name = "private-subnet2"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table" "privroute2" {
+  vpc_id = aws_vpc.tf-vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.natgw.id
+  }
+
+  tags = {
+    Name = "privroute2"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table_association" "rtapriv2" {
+  subnet_id      = aws_subnet.privatesubnet2.id
+  route_table_id = aws_route_table.privroute2.id
+}
+
+resource "aws_route_table" "pubroute2" {
   vpc_id = aws_vpc.tf-vpc.id
 
   route {
@@ -65,14 +139,14 @@ resource "aws_route_table" "route2" {
   }
 
   tags = {
-    Name = "route2"
+    Name = "pubroute2"
     Environment = var.environment
   }
 }
 
-resource "aws_route_table_association" "b" {
-  subnet_id      = aws_subnet.public-subnet2.id
-  route_table_id = aws_route_table.route2.id
+resource "aws_route_table_association" "rtapub2" {
+  subnet_id      = aws_subnet.publicsubnet2.id
+  route_table_id = aws_route_table.pubroute2.id
 }
 
 
