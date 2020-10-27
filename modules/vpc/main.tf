@@ -24,6 +24,15 @@ resource "aws_nat_gateway" "natgw" {
   }
 }
 
+resource "aws_internet_gateway" "igw1" {
+  vpc_id = aws_vpc.tf-vpc.id
+
+  tags = {
+    Name = "igw"
+    Environment = var.environment
+  }
+}
+
 resource "aws_subnet" "publicsubnet1" {
   vpc_id     = aws_vpc.tf-vpc.id
   cidr_block = var.pubsubnet1cidr
@@ -32,6 +41,54 @@ resource "aws_subnet" "publicsubnet1" {
     Name = "public-subnet1"
     Environment = var.environment
   }
+}
+
+resource "aws_route_table" "pubroute1" {
+  vpc_id = aws_vpc.tf-vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw1.id
+  }
+
+  tags = {
+    Name = "pubroute1"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table_association" "rtapub1" {
+  subnet_id      = aws_subnet.publicsubnet1.id
+  route_table_id = aws_route_table.pubroute1.id
+}
+
+resource "aws_subnet" "publicsubnet2" {
+  vpc_id     = aws_vpc.tf-vpc.id
+  cidr_block = var.pubsubnet2cidr
+
+  tags = {
+    Name = "public-subnet2"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table" "pubroute2" {
+  vpc_id = aws_vpc.tf-vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw1.id
+  }
+
+  tags = {
+    Name = "pubroute2"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table_association" "rtapub2" {
+  subnet_id      = aws_subnet.publicsubnet2.id
+  route_table_id = aws_route_table.pubroute2.id
 }
 
 resource "aws_subnet" "privatesubnet1" {
@@ -63,44 +120,6 @@ resource "aws_route_table_association" "rtapriv1" {
   route_table_id = aws_route_table.privroute1.id
 }
 
-resource "aws_route_table" "pubroute1" {
-  vpc_id = aws_vpc.tf-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw1.id
-  }
-
-  tags = {
-    Name = "pubroute1"
-    Environment = var.environment
-  }
-}
-
-resource "aws_route_table_association" "rtapub1" {
-  subnet_id      = aws_subnet.publicsubnet1.id
-  route_table_id = aws_route_table.pubroute1.id
-}
-
-resource "aws_internet_gateway" "igw1" {
-  vpc_id = aws_vpc.tf-vpc.id
-
-  tags = {
-    Name = "igw"
-    Environment = var.environment
-  }
-}
-
-resource "aws_subnet" "publicsubnet2" {
-  vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.pubsubnet2cidr
-
-  tags = {
-    Name = "public-subnet2"
-    Environment = var.environment
-  }
-}
-
 resource "aws_subnet" "privatesubnet2" {
   vpc_id     = aws_vpc.tf-vpc.id
   cidr_block = var.privsubnet2cidr
@@ -129,26 +148,6 @@ resource "aws_route_table_association" "rtapriv2" {
   subnet_id      = aws_subnet.privatesubnet2.id
   route_table_id = aws_route_table.privroute2.id
 }
-
-resource "aws_route_table" "pubroute2" {
-  vpc_id = aws_vpc.tf-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw1.id
-  }
-
-  tags = {
-    Name = "pubroute2"
-    Environment = var.environment
-  }
-}
-
-resource "aws_route_table_association" "rtapub2" {
-  subnet_id      = aws_subnet.publicsubnet2.id
-  route_table_id = aws_route_table.pubroute2.id
-}
-
 
 resource "aws_security_group" "security-group1" {
   name        = "allow_tls"
