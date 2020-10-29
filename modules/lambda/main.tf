@@ -1,8 +1,3 @@
-# Declares the VPC module
-module "vpc"{
-    source = "../vpc"
-}
-
 resource "aws_lambda_function" "getfunc" {
    function_name = "GetFunction"
 
@@ -20,8 +15,8 @@ resource "aws_lambda_function" "getfunc" {
    publish          = true
 
    vpc_config{
-     subnet_ids = [module.vpc.subnet1id, module.vpc.subnet2id]
-     security_group_ids = [module.vpc.securitygroupid]
+     subnet_ids = [var.subnet1id, var.subnet2id]
+     security_group_ids = [var.securitygroupid]
    } 
 
    role = aws_iam_role.lambda_exec.arn
@@ -48,8 +43,8 @@ resource "aws_lambda_function" "postfunc" {
    publish          = true
 
    vpc_config{
-     subnet_ids = [module.vpc.subnet1id, module.vpc.subnet2id]
-     security_group_ids = [module.vpc.securitygroupid]
+     subnet_ids = [var.subnet1id, var.subnet2id]
+     security_group_ids = [var.securitygroupid]
    } 
 
    role = aws_iam_role.lambda_exec.arn

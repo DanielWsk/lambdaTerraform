@@ -1,7 +1,3 @@
-module "lambda"{
-   source = "../lambda"
-}
-
 resource "aws_api_gateway_rest_api" "example" {
   name        = "ServerlessExample"
   description = "Terraform Serverless Application Example"
@@ -38,7 +34,7 @@ resource "aws_api_gateway_integration" "lambda" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = module.lambda.lambda_uri
+   uri                     = var.lambda_uri
 }
 
 resource "aws_api_gateway_integration" "lambda_root" {
@@ -48,7 +44,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = module.lambda.lambda_root_uri
+   uri                     = var.lambda_root_uri
 }
 
 resource "aws_api_gateway_deployment" "example" {
@@ -64,7 +60,7 @@ resource "aws_api_gateway_deployment" "example" {
 resource "aws_lambda_permission" "apigw1" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"
-   function_name = module.lambda.getfuncname
+   function_name = var.getfuncname
    principal     = "apigateway.amazonaws.com"
 
    # The "/*/*" portion grants access from any method on any resource
@@ -75,7 +71,7 @@ resource "aws_lambda_permission" "apigw1" {
 resource "aws_lambda_permission" "apigw2" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"
-   function_name = module.lambda.postfuncname
+   function_name = var.postfuncname
    principal     = "apigateway.amazonaws.com"
 
    # The "/*/*" portion grants access from any method on any resource
