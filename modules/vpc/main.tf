@@ -35,7 +35,7 @@ resource "aws_internet_gateway" "igw1" {
 
 resource "aws_subnet" "publicsubnet1" {
   vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.pubsubnet1cidr
+  cidr_block = var.pubsubnetcidrs[0]
 
   tags = {
     Name = "public-subnet1"
@@ -64,7 +64,7 @@ resource "aws_route_table_association" "rtapub1" {
 
 resource "aws_subnet" "publicsubnet2" {
   vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.pubsubnet2cidr
+  cidr_block = var.pubsubnetcidrs[1]
 
   tags = {
     Name = "public-subnet2"
@@ -93,7 +93,7 @@ resource "aws_route_table_association" "rtapub2" {
 
 resource "aws_subnet" "privatesubnet1" {
   vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.privsubnet1cidr
+  cidr_block = var.privsubnetcidrs[0]
 
   tags = {
     Name = "private-subnet1"
@@ -122,7 +122,7 @@ resource "aws_route_table_association" "rtapriv1" {
 
 resource "aws_subnet" "privatesubnet2" {
   vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.privsubnet2cidr
+  cidr_block = var.privsubnetcidrs[1]
 
   tags = {
     Name = "private-subnet2"

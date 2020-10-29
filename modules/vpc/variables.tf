@@ -27,3 +27,14 @@ variable "privsubnet2cidr" {
   description = "The VPC cidr block"
   default = "10.0.4.0/24"
 }
+
+variable "pubsubnetcidrs" {
+  type = list
+  description = "cidr blocks for public subnets"
+}
+
+variable "privsubnetcidrs" {
+  type = list
+  description = "cidr blocks for private subnets"
+}
+
