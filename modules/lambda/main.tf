@@ -53,6 +53,16 @@ resource "aws_lambda_function" "postfunc" {
   }  
 }
 
+resource "aws_iam_role_policy_attachment" "basic-exec-role" {
+    role       = aws_iam_role.lambda_exec.id
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "vpc_access" {
+    role       = aws_iam_role.lambda_exec.id
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
 # The IAM Policy that gives lambda access to other AWS services
 resource "aws_iam_role_policy" "lambda_policy" {
   name = "lambda_policy"
@@ -64,7 +74,13 @@ resource "aws_iam_role_policy" "lambda_policy" {
     "Statement": [
       {
         "Action": [
-          "*"
+          "dynamodb:BatchGetItem",
+          "dynamodb:Describe*",
+          "dynamodb:List*",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
         ],
         "Effect": "Allow",
         "Resource": "*"
