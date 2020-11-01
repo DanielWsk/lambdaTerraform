@@ -23,7 +23,8 @@ The module will create as many subnets as there are CIDR Blocks defined in the t
 The module also creates a security group that allows ingress traffic from port 443 and egress from all cidr ranges. 
 
 ### Lambda Module
-This module creates the two lambda functions. #### The code for the lambda functions are stored in the S3 bucket: terraform-serverless-example323.
+This module creates the two lambda functions. 
+#### The code for the lambda functions are stored in the S3 bucket: terraform-serverless-example323.
 A role is also created for the lambda functions to assume. The policies attached to the role allow the lambda function to interact with the DynamoDB database.
 
 ### API Gateway
