@@ -1,5 +1,26 @@
 # terraformProject
- A demonstration of terraform infrastructure for a lambda microservice 
+ _A demonstration of terraform deployment for a lambda microservice_ 
 
 
 This project deploys two lambda functions connected to a DynamoDB database.
+One Lambda Function takes a value to put inside the database, and one lambda function gets all the values from the database.
+
+
+##Modules
+
+###VPC Module
+This module creates a VPC with public subnets and private subnets. The public subnets are connected to an Internet Gateway and the Private subnets are connected to a Nat Gateway. 
+
+The module will create as many subnets as there are CIDR Blocks defined in the tfvars file for the variables: pubsubcidrs and privsubcidrs. The module will create one subnet for each cidr range. 
+
+The module also creates a security group that allows ingress traffic from port 443 and egress from all cidr ranges. 
+
+###Lambda Module
+This module creates the two lambda functions. The code for the lambda functions are stored in the S3 bucket: terraform-serverless-example323.
+A role is also created for the lambda functions to assume. The policies attached to the role allow the lambda function to interact with the DynamoDB database.
+
+###API Gateway
+This module creates the API resource along with the methods for GET and POST for the lambda functions. 
+
+###Database
+This module creates the DynamoDB database and declares the hashkey the database will use to store the items.
