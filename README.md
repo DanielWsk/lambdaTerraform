@@ -5,6 +5,13 @@
 This project deploys two lambda functions connected to a DynamoDB database.
 One Lambda Function takes a value to put inside the database, and one lambda function gets all the values from the database.
 
+## dev/prod Environments
+
+This project makes use of tfvar files to set the variables for individual environments. The CIDR range for the VPC and subnets can be set in these files, as well as the availability zones and database hashkey. 
+To apply the terraform deployment using these variables, specify the file during the terraform apply command.
+Example: terraform apply -var-file=<name>.tfvars
+ 
+If no tfvars file is specified, the deployment will use the default values found inside the variables.tf file for each module. 
 
 ## Modules
 
