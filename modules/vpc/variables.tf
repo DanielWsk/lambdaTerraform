@@ -29,12 +29,16 @@ variable "privsubnet2cidr" {
 }
 
 variable "pubsubnetcidrs" {
-  type = list
+  type = list(string)
   description = "cidr blocks for public subnets"
 }
 
 variable "privsubnetcidrs" {
-  type = list
+  type = list(string)
   description = "cidr blocks for private subnets"
 }
 
+variable "azs" {
+  description = "List of availability zones names in the region"
+  type        = list(string)
+}

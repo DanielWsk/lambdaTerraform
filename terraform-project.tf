@@ -8,6 +8,7 @@ module "vpc"{
     cidr = var.cidr
     pubsubnetcidrs = var.pubsubnetcidrs
     privsubnetcidrs = var.privsubnetcidrs
+    azs = var.azs
     environment = var.environment
 }
 
@@ -47,6 +48,13 @@ terraform {
 
 variable "environment"{}
 variable "cidr"{}
-variable "pubsubnetcidrs"{}
-variable "privsubnetcidrs"{}
+variable "pubsubnetcidrs"{
+  type        = list(string)
+}
+variable "privsubnetcidrs"{
+  type        = list(string)
+}
 variable "hashkey"{}
+variable "azs"{
+  type        = list(string)
+}

@@ -14,9 +14,9 @@ resource "aws_eip" "elasticip" {
 
 resource "aws_nat_gateway" "natgw" {
   allocation_id = aws_eip.elasticip.id
-  subnet_id     = aws_subnet.publicsubnet1.id
+  subnet_id     = aws_subnet.publicsubnet[0].id
 
-  depends_on = [aws_internet_gateway.igw1]
+  depends_on    = [aws_internet_gateway.igw1]
 
   tags = {
     Name = "natgw"
@@ -33,17 +33,20 @@ resource "aws_internet_gateway" "igw1" {
   }
 }
 
-resource "aws_subnet" "publicsubnet1" {
-  vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.pubsubnetcidrs[0]
+resource "aws_subnet" "publicsubnet" {
+  count              = length(var.pubsubnetcidrs)
+
+  vpc_id             = aws_vpc.tf-vpc.id
+  cidr_block         = element(concat(var.pubsubnetcidrs, [""]), count.index)
+  availability_zone  = element(concat(var.azs, [""]), count.index)
 
   tags = {
-    Name = "public-subnet1"
+    Name = "public-subnet ${count.index}"
     Environment = var.environment
   }
 }
 
-resource "aws_route_table" "pubroute1" {
+resource "aws_route_table" "pubroute" {
   vpc_id = aws_vpc.tf-vpc.id
 
   route {
@@ -52,56 +55,32 @@ resource "aws_route_table" "pubroute1" {
   }
 
   tags = {
-    Name = "pubroute1"
+    Name = "pubroute"
     Environment = var.environment
   }
 }
 
-resource "aws_route_table_association" "rtapub1" {
-  subnet_id      = aws_subnet.publicsubnet1.id
-  route_table_id = aws_route_table.pubroute1.id
+resource "aws_route_table_association" "rtapub" {
+  count          = length(var.pubsubnetcidrs)
+
+  subnet_id      = element(aws_subnet.publicsubnet.*.id, count.index)
+  route_table_id = aws_route_table.pubroute.id
 }
 
-resource "aws_subnet" "publicsubnet2" {
-  vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.pubsubnetcidrs[1]
+resource "aws_subnet" "privatesubnet" {
+  count             = length(var.privsubnetcidrs)
+
+  vpc_id            = aws_vpc.tf-vpc.id
+  cidr_block        = element(concat(var.privsubnetcidrs, [""]), count.index)
+  availability_zone = element(concat(var.azs, [""]), count.index)
 
   tags = {
-    Name = "public-subnet2"
+    Name = "private-subnet ${count.index}"
     Environment = var.environment
   }
 }
 
-resource "aws_route_table" "pubroute2" {
-  vpc_id = aws_vpc.tf-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw1.id
-  }
-
-  tags = {
-    Name = "pubroute2"
-    Environment = var.environment
-  }
-}
-
-resource "aws_route_table_association" "rtapub2" {
-  subnet_id      = aws_subnet.publicsubnet2.id
-  route_table_id = aws_route_table.pubroute2.id
-}
-
-resource "aws_subnet" "privatesubnet1" {
-  vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.privsubnetcidrs[0]
-
-  tags = {
-    Name = "private-subnet1"
-    Environment = var.environment
-  }
-}
-
-resource "aws_route_table" "privroute1" {
+resource "aws_route_table" "privroute" {
   vpc_id = aws_vpc.tf-vpc.id
 
   route {
@@ -110,43 +89,16 @@ resource "aws_route_table" "privroute1" {
   }
 
   tags = {
-    Name = "privroute1"
+    Name = "privroute"
     Environment = var.environment
   }
 }
 
-resource "aws_route_table_association" "rtapriv1" {
-  subnet_id      = aws_subnet.privatesubnet1.id
-  route_table_id = aws_route_table.privroute1.id
-}
+resource "aws_route_table_association" "rtapriv" {
+  count          = length(var.pubsubnetcidrs)
 
-resource "aws_subnet" "privatesubnet2" {
-  vpc_id     = aws_vpc.tf-vpc.id
-  cidr_block = var.privsubnetcidrs[1]
-
-  tags = {
-    Name = "private-subnet2"
-    Environment = var.environment
-  }
-}
-
-resource "aws_route_table" "privroute2" {
-  vpc_id = aws_vpc.tf-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.natgw.id
-  }
-
-  tags = {
-    Name = "privroute2"
-    Environment = var.environment
-  }
-}
-
-resource "aws_route_table_association" "rtapriv2" {
-  subnet_id      = aws_subnet.privatesubnet2.id
-  route_table_id = aws_route_table.privroute2.id
+  subnet_id      = element(aws_subnet.privatesubnet.*.id, count.index)
+  route_table_id = aws_route_table.privroute.id
 }
 
 resource "aws_security_group" "security-group1" {
@@ -170,7 +122,7 @@ resource "aws_security_group" "security-group1" {
   }
 
   tags = {
-    Name = "allow_tls"
+    Name   = "allow_tls"
     Environment = var.environment
   }
 }
