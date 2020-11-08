@@ -5,5 +5,5 @@ variable "environment" {
 
 variable "hashkey" {
   description = "The name of the partition key"
-  default = "UserId"
+  default = "id"
 }
